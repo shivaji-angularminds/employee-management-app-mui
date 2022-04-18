@@ -11,7 +11,6 @@ import { Avatar, IconButton, Typography } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Employees from "./Employees";
-import { NewReleases } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -82,26 +81,22 @@ export default function CustomizedTables() {
         </TableHead>
         <TableBody>
           {array.map((row,index) => (
-            <StyledTableRow key={row.name}>
-              <StyledTableCell component="th" scope="Employees">
-              <Avatar  >{ row.name && row.name.split(' ')[0][0]}{row.name.split(' ')[1][0]}</Avatar>
+            <StyledTableRow key={row.name}><StyledTableCell component="th" scope="Employees">
+              <Avatar  >{ row.name.split(" ").length==1?         row.name.split("")[0]   :row.name.split(' ')[0][0]}{ row.name.split(" ").length==2 &&row.name.split(' ')[1][0]}</Avatar>
               </StyledTableCell>
               <StyledTableCell align="center">{row.name}</StyledTableCell>
               <StyledTableCell align="center">{row.email}</StyledTableCell>
               <StyledTableCell align="center">{row.mobileNo}</StyledTableCell>
               <StyledTableCell align="center">
-                <IconButton aria-label="delete" size="large">
-                  <EditIcon fontSize="inherit" onClick={()=>{
+                <IconButton aria-label="delete" onClick={()=>{
                   navigate(`/employees/update/${index}`, { state: { index:index } });
 
-                }}  />                </IconButton>
-                <IconButton aria-label="delete" size="large">
-                <DeleteIcon onClick={()=>{
+                }}  size="large"><EditIcon fontSize="inherit"  /></IconButton>
+                <IconButton aria-label="delete" onClick={()=>{
                     console.log("fdhvw")
                     handleDeleteClick(index)
-                }} fontSize="inherit" />
-              </IconButton>
-              </StyledTableCell>{" "}
+                }}  size="large"><DeleteIcon fontSize="inherit" /></IconButton>
+              </StyledTableCell>
             </StyledTableRow>
           ))}
         </TableBody>

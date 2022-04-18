@@ -76,7 +76,7 @@ function Form() {
 
   useEffect(()=>{
       if(!flag){
-      validateEmail(data.email,data.name)}
+      validateEmail()}
   },[data.name,data.email,data.mobileNo])
 
  function findStateCode(stateName){
@@ -88,7 +88,7 @@ function Form() {
   })
  }
 
-  console.log(stateCode)
+  console.log(flag)
   //   useEffect(()=>{
   //       if(state || data.state){
   //           deriverStateId()
@@ -120,29 +120,33 @@ function Form() {
   }
 
  
-
+console.log(flagStatus)
   function validateEmail() {
+    let mobileFlag=false;
+    let nameFlag=false
+    let emailFlag=false
+    console.log("form validatuon is here")
     let result = true;
     let sampleError = {...errors};
     if (!data.name) {
-console.log("hgfevhy")
+
       sampleError.name = "Name is Required";
-      flagStatus=false
+      nameFlag=false
 
     }else{
-      flagStatus=true
+      nameFlag=true
         console.log("whjbfuwb")
         sampleError.name="" 
     }
     console.log(data.mobileNo)
     if (!data.mobileNo ) {
         if(data.mobileNo.toString().length<10 || data.mobileNo.toString().length > 10){
-          flagStatus=false
+          mobileFlag=false
 
         console.log(data.mobileNo.toString().length)
               sampleError.mobileNo = "Please provide Valid Mobile No";}
               else{
-                flagStatus=true
+                mobileFlag=true
 
                 sampleError.mobileNo="" 
             }
@@ -150,19 +154,19 @@ console.log("hgfevhy")
             }
             else{
                 if(data.mobileNo.toString().length<10 || data.mobileNo.toString().length > 10){
-                  flagStatus=false
+                  mobileFlag=false
 
                     console.log(data.mobileNo.toString().length)
                           sampleError.mobileNo = "Please provide Valid Mobile No";}
                           else{
-                            flagStatus=true
+                            mobileFlag=true
 
                             sampleError.mobileNo="" 
                         }
             }
            
     if (!data.email) {
-      flagStatus=false
+      emailFlag=false
 
       sampleError.email = "Email is Required";
       result = false;
@@ -171,16 +175,21 @@ console.log("hgfevhy")
         /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
       result = re.test(String(data.email).toLowerCase());
       if (!result) sampleError.email = "Invalid Email address";
-      if(!result )       flagStatus=false
+      if(!result )       emailFlag=false
 
     }
     if(result){
-      flagStatus=true
+      emailFlag=true
 
         sampleError.email = ""
     }
-    console.log(sampleError);
-    setErrors(sampleError);
+    
+    setErrors(sampleError)
+    
+    if(emailFlag && mobileFlag && nameFlag){
+      flagStatus=true
+    }
+
   }
 
   function handleCheckBoxCheck(event) {
@@ -215,6 +224,8 @@ console.log("hgfevhy")
   //           <h1>Loading</h1>
   //       )
   //   }
+
+  console.log(districts)
 
   return (
     <Container
@@ -311,10 +322,11 @@ console.log("hgfevhy")
           sx={{ width: "450px", paddingTop: "10" }}
           name="state"
           inputValue={data.state}
+          defaultValue={data.state}
 
-          onChange={(event, value) => {
+          onInputChange={(event, value) => {
             findStateCode(value)
-            setData({ ...data, state: value });
+            setData({ ...data, state: value ,city:""});
           }} // prints the selected value
           options={
              state[0].map((prev) => prev.name )
@@ -334,25 +346,32 @@ console.log("hgfevhy")
       >
         <Autocomplete
           disablePortal
-          inputValue={data.city}
+          inputValue={  data.city}
+          // defaultValue={ stateCode ? data.city:""}
           id="combo-box-demo1"
           name="city"
           sx={{ paddingRight: "10px", width: "450px" }}
-          onChange={(event, value) => setData({ ...data, city: value })}
-          options={stateCode && districts.map(prev=>prev.name)}
+          onInputChange={(event, value) => setData({ ...data, city: value })}
+          options={state && districts.map(prev=>prev.name)}
           renderInput={(params) => <TextField {...params} label="City" />}
         />
 
         <LocalizationProvider dateAdapter={AdapterDateFns}>
           <DatePicker
-            label="Date of Birth"
+  keyboard
+  placeholder="MM/DD/YYYY"
+  format={"MM/DD/YYYY"}       
+       label="Date of Birth"
             value={data.DOB}
             sx={{ paddingRight: "10px", width: "450px" }}
-            format="DD-MM-YYYY"
             views={["year", "month", "day"]}
             disableFuture
             name="DOB"
             onChange={handleDateChange}
+            disableOpenOnEnter
+            animateYearScrolling={false}
+            autoOk={true}
+            clearable
             renderInput={(params) => <TextField {...params} />}
           />
         </LocalizationProvider>
@@ -375,6 +394,7 @@ console.log("hgfevhy")
           <FormControlLabel
             name="gender"
             onChange={handleChange}
+            
             value="male"
             control={<Radio />}
             label="Male"
@@ -405,6 +425,7 @@ console.log("hgfevhy")
           <FormControlLabel
             control={
               <Checkbox
+
                 value="playing"
                 onChange={handleCheckBoxCheck}
                 name="playing"
@@ -416,6 +437,7 @@ console.log("hgfevhy")
           <FormControlLabel
             control={
               <Checkbox
+
                 value="singing"
                 onChange={handleCheckBoxCheck}
                 name="singing"
@@ -443,16 +465,20 @@ console.log("hgfevhy")
           onChange={handleChange}
         />
       </box>
+<box>
 
       <Button
         variant="contained"
         onClick={() => {
-          let array = [...dataArray];
-          array.push(data);
-          validateEmail();
           setFlag(false)
-
+          validateEmail();
           if(flagStatus){
+            
+            let array = [...dataArray];
+          array.push(data);
+         
+        
+
           localStorage.setItem("dataArray", JSON.stringify(array));
           setDataArray(array);
           
@@ -463,6 +489,11 @@ console.log("hgfevhy")
       >
         Submit
       </Button>
+      <Button onClick={()=>{
+         navigate(`/employees`)
+      }} > Cancel</Button>
+      </box>
+      
     </Container>
   );
 }
